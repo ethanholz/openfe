@@ -5,6 +5,7 @@ import json
 import pathlib
 from openfecli.utils import write
 from openfe import AlchemicalNetwork, LigandNetwork
+from openfe.storage.warehouse import FileSystemWarehouse
 
 
 def plan_alchemical_network_output(
@@ -34,3 +35,17 @@ def plan_alchemical_network_output(
         filename = f"{transformation_name}.json"
         transformation.to_json(transformations_dir / filename)
         write("\t\t\t\t- " + filename)
+
+
+def plan_alchemical_network_output_warehouse(
+    alchemical_network: AlchemicalNetwork, ligand_network: LigandNetwork, folder_path: pathlib.Path
+):
+    """Write the contents of the alchemical network"""
+    base_name = folder_path.name
+    folder_path.mkdir(parents=True, exist_ok=True)
+    warehouse = FileSystemWarehouse(base_name)
+    warehouse.store_setup_tokenizable(alchemical_network)
+    ln_fname = "ligand_network.graphml"
+    with open(folder_path / ln_fname, mode="w") as f:
+        f.write(ligand_network.to_graphml())
+    write(f"\t\t- {ln_fname}")

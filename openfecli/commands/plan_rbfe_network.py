@@ -179,7 +179,8 @@ def plan_rbfe_network(
     write("______________________")
     write("")
 
-    from openfecli.plan_alchemical_networks_utils import plan_alchemical_network_output
+    # from openfecli.plan_alchemical_networks_utils import plan_alchemical_network_output
+    from openfecli.plan_alchemical_networks_utils import plan_alchemical_network_output_warehouse
 
     write("Parsing in Files: ")
 
@@ -244,7 +245,7 @@ def plan_rbfe_network(
     # OUTPUT
     write("Output:")
     write("\tSaving to: " + str(output_dir))
-    plan_alchemical_network_output(
+    plan_alchemical_network_output_warehouse(
         alchemical_network=alchemical_network,
         ligand_network=ligand_network,
         folder_path=OUTPUT_DIR.get(output_dir),
