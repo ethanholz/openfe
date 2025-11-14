@@ -45,7 +45,4 @@ def plan_alchemical_network_output_warehouse(
     folder_path.mkdir(parents=True, exist_ok=True)
     warehouse = FileSystemWarehouse(base_name)
     warehouse.store_setup_tokenizable(alchemical_network)
-    ln_fname = "ligand_network.graphml"
-    with open(folder_path / ln_fname, mode="w") as f:
-        f.write(ligand_network.to_graphml())
-    write(f"\t\t- {ln_fname}")
+    warehouse.store_setup_tokenizable(ligand_network)
