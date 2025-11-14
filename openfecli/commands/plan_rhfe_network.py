@@ -15,6 +15,7 @@ from openfecli.parameters import (
     NCORES,
     OVERWRITE,
     N_PROTOCOL_REPEATS,
+    WAREHOUSE,
 )
 
 
@@ -104,6 +105,9 @@ def plan_rhfe_network_main(
 @MOL_DIR.parameter(required=True, help=MOL_DIR.kwargs["help"] + " Any number of sdf paths.")
 @YAML_OPTIONS.parameter(multiple=False, required=False, default=None, help=YAML_OPTIONS.kwargs["help"])  # fmt: skip
 @OUTPUT_DIR.parameter(help=OUTPUT_DIR.kwargs["help"] + " Defaults to `./alchemicalNetwork`.", default="alchemicalNetwork")  # fmt: skip
+@WAREHOUSE.parameter(
+    help=WAREHOUSE.kwargs["help"], default=WAREHOUSE.kwargs["default"], is_flag=True
+)
 @N_PROTOCOL_REPEATS.parameter(multiple=False, required=False, default=3, help=N_PROTOCOL_REPEATS.kwargs["help"])  # fmt: skip
 @NCORES.parameter(help=NCORES.kwargs["help"], default=1)
 @OVERWRITE.parameter(help=OVERWRITE.kwargs["help"], default=OVERWRITE.kwargs["default"], is_flag=True)  # fmt: skip
@@ -112,6 +116,7 @@ def plan_rhfe_network(
     molecules: List[str],
     yaml_settings: str,
     output_dir: str,
+    warehouse: bool,
     n_cores: int,
     overwrite_charges: bool,
     n_protocol_repeats: int,
@@ -155,7 +160,10 @@ def plan_rhfe_network(
     write("______________________")
     write("")
 
-    from openfecli.plan_alchemical_networks_utils import plan_alchemical_network_output
+    from openfecli.plan_alchemical_networks_utils import (
+        plan_alchemical_network_output,
+        plan_alchemical_network_output_warehouse,
+    )
 
     write("Parsing in Files: ")
 
@@ -207,13 +215,20 @@ def plan_rhfe_network(
     write("")
 
     # OUTPUT
-    write("Output:")
-    write("\tSaving to: " + output_dir)
-    plan_alchemical_network_output(
-        alchemical_network=alchemical_network,
-        ligand_network=ligand_network,
-        folder_path=OUTPUT_DIR.get(output_dir),
-    )
+    if warehouse:
+        plan_alchemical_network_output_warehouse(
+            alchemical_network=alchemical_network,
+            ligand_network=ligand_network,
+            folder_path=OUTPUT_DIR.get(output_dir),
+        )
+    else:
+        write("Output:")
+        write("\tSaving to: " + output_dir)
+        plan_alchemical_network_output(
+            alchemical_network=alchemical_network,
+            ligand_network=ligand_network,
+            folder_path=OUTPUT_DIR.get(output_dir),
+        )
 
 
 PLUGIN = OFECommandPlugin(
