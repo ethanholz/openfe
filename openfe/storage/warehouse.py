@@ -354,5 +354,6 @@ class FileSystemWarehouse(WarehouseBaseClass):
     def __init__(self, root_dir: str = "warehouse"):
         setup_store = FileStorage(f"{root_dir}/setup")
         result_store = FileStorage(f"{root_dir}/result")
-        stores = WarehouseStores(setup=setup_store, result=result_store)
+        task_store = FileStorage(f"{root_dir}/task")
+        stores = WarehouseStores(setup=setup_store, result=result_store, task=task_store)
         super().__init__(stores)
