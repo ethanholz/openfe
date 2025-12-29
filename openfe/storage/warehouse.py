@@ -332,6 +332,17 @@ class WarehouseBaseClass:
         """
         return self.stores["result"]
 
+    @property
+    def task_store(self):
+        """Get the task store
+
+        Returns
+        -------
+        ExternalStorage
+            The task storage location
+        """
+        return self.stores["task"]
+
 
 class FileSystemWarehouse(WarehouseBaseClass):
     """Warehouse implementation using local filesystem storage.
