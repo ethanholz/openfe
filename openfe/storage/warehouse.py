@@ -3,8 +3,9 @@
 import abc
 import json
 import re
-from typing import Literal, TypedDict
+from typing import Literal, TypeAlias, TypedDict
 
+from gufe.protocols.protocoldag import ProtocolDAG
 from gufe.storage.externalresource import ExternalStorage, FileStorage
 from gufe.tokenization import (
     JSON_HANDLER,
@@ -35,6 +36,10 @@ class WarehouseStores(TypedDict):
 
     setup: ExternalStorage
     result: ExternalStorage
+    task: ExternalStorage
+
+
+WarehouseStoreKey = Literal["setup", "result", "task"]
 
 
 class WarehouseBaseClass:
@@ -133,6 +138,40 @@ class WarehouseBaseClass:
         """
         return self._load_gufe_tokenizable(gufe_key=obj)
 
+    def store_dag(self, obj: ProtocolDAG):
+        """Store a ProtocolDAG to a task store.
+
+        Parameters
+        ----------
+        obj : ProtocolDAG
+            The DAG you want to store.
+        """
+        return self._store_gufe_tokenizable("task", obj)
+
+    def load_dag(self, obj: GufeKey) -> ProtocolDAG:
+        """Load a ProtocolDAG for a given GufeKey.
+
+        Parameters
+        ----------
+        obj : GufeKey
+            The key to the ProtocolDAG you want to load.
+
+        Returns
+        -------
+        ProtocolDAG
+            The DAG stored in Warehouse.
+
+        Raises
+        ------
+        KeyError
+            If a given GufeKey does not actually load a ProtocolDAG
+        """
+        out = self._load_gufe_tokenizable(obj)
+        if not isinstance(out, ProtocolDAG):
+            # TODO: Not sure if this is really the right thing here.
+            raise KeyError(f"GufeKey {obj} is not a ProtocolDAG")
+        return out
+
     def exists(self, key: GufeKey) -> bool:
         """Check if an object with the given key exists in any store.
 
@@ -171,7 +210,7 @@ class WarehouseBaseClass:
                 return self.stores[name]
         raise ValueError(f"GufeKey {key} is not stored")
 
-    def _store_gufe_tokenizable(self, store_name: Literal["setup", "result"], obj: GufeTokenizable):
+    def _store_gufe_tokenizable(self, store_name: WarehouseStoreKey, obj: GufeTokenizable):
         """Store a GufeTokenizable object with deduplication.
 
             Parameters
